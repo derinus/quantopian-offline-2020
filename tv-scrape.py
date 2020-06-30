@@ -3,6 +3,19 @@ import json
 import pprint
 import random
 import string
+import re
+
+def filt(text):
+    try:
+        found = re.search('"m":"(.+?)",', text).group(1)
+        found2 = re.search('"p":(.+?"}"])}', text).group(1)
+        print(found)
+        print(found2)
+        return found1, found2
+    except AttributeError:
+        # AAA, ZZZ not found in the original string
+        print("error")
+    
 
 def generateSession():
     stringLength=12
@@ -68,26 +81,19 @@ print("session generated {}".format(session))
 chart_session= generateChartSession()
 print("chart_session generated {}".format(chart_session))
 
+# Then send a message through the tunnel 
 sendMessage(ws, "set_auth_token", ["unauthorized_user_token"])
 sendMessage(ws, "chart_create_session", [chart_session, ""])
 sendMessage(ws, "quote_create_session", [session])
-sendMessage(ws, "quote_add_symbols",[session, ticker, {"flags":['force_permission']})
-                      ]
-
-registerTicker(ws, session, "NASDAQ:AAPL")
-
 sendMessage(ws,"quote_set_fields", [session,"ch","chp","current_session","description","local_description","language","exchange","fractional","is_tradable","lp","lp_time","minmov","minmove2","original_name","pricescale","pro_name","short_name","type","update_mode","volume","currency_code","rchp","rtc"])
-sendMessage(ws, "create_study", [chart_session,"st4","st1","s1","ESD@tv-scripting-101!",{"text":"BNEhyMp2zcJFvntl+CdKjA==_DkJH8pNTUOoUT2BnMT6NHSuLIuKni9D9SDMm1UOm/vLtzAhPVypsvWlzDDenSfeyoFHLhX7G61HDlNHwqt/czTEwncKBDNi1b3fj26V54CkMKtrI21tXW7OQD/OSYxxd6SzPtFwiCVAoPbF2Y1lBIg/YE9nGDkr6jeDdPwF0d2bC+yN8lhBm03WYMOyrr6wFST+P/38BoSeZvMXI1Xfw84rnntV9+MDVxV8L19OE/0K/NBRvYpxgWMGCqH79/sHMrCsF6uOpIIgF8bEVQFGBKDSxbNa0nc+npqK5vPdHwvQuy5XuMnGIqsjR4sIMml2lJGi/XqzfU/L9Wj9xfuNNB2ty5PhxgzWiJU1Z1JTzsDsth2PyP29q8a91MQrmpZ9GwHnJdLjbzUv3vbOm9R4/u9K2lwhcBrqrLsj/VfVWMSBP","pineId":"TV_SPLITS","pineVersion":"8.0"}])
+sendMessage(ws, "quote_add_symbols",[session, "NASDAQ:AAPL", {"flags":['force_permission']}])
+sendMessage(ws, "quote_fast_symbols", [session,"NASDAQ:AAPL"])
 
-#sendMessage(ws, "quote_fast_symbols", [session,"NASDAQ:AAPL"])
-
-# Then send a message through the tunnel 
-# ws.send('{"m":"quote_create_session","p":["qs_dsiBrpSBE4Ur"]}')
-#ws.send(json.dumps('{"m":"quote_fast_symbols","p":["qs_jkGok521GAM9","SP:SPX","TVC:DXY","BITSTAMP:BTCUSD","BINANCE:BTCUSDT","FX:EURUSD","FX:GBPUSD"]}	'))
-# ws.send('{"m":"set_auth_token","p":["unauthorized_user_token"]}')
-# ws.send('{"m":"quote_create_session","p":["qs_iucdPV0ud0pY"]}')
-# ws.send('{"m":"quote_add_symbols","p":["qs_iucdPV0ud0pY","NASDAQ:AAPL",{"flags":["force_permission"]}]}')
-# ws.send('{"m":"quote_fast_symbols","p":["qs_iucdPV0ud0pY","NASDAQ:AAPL"]}')
+#st='~m~140~m~{"m":"resolve_symbol","p":}'
+#p1, p2 = filt(st)
+sendMessage(ws, "resolve_symbol", [chart_session,"symbol_1","={\"symbol\":\"NASDAQ:AAPL\",\"adjustment\":\"splits\",\"session\":\"extended\"}"])
+sendMessage(ws, "create_series", [chart_session, "s1", "s1", "symbol_1", "1", 5000])
+#sendMessage(ws, "create_study", [chart_session,"st4","st1","s1","ESD@tv-scripting-101!",{"text":"BNEhyMp2zcJFvntl+CdKjA==_DkJH8pNTUOoUT2BnMT6NHSuLIuKni9D9SDMm1UOm/vLtzAhPVypsvWlzDDenSfeyoFHLhX7G61HDlNHwqt/czTEwncKBDNi1b3fj26V54CkMKtrI21tXW7OQD/OSYxxd6SzPtFwiCVAoPbF2Y1lBIg/YE9nGDkr6jeDdPwF0d2bC+yN8lhBm03WYMOyrr6wFST+P/38BoSeZvMXI1Xfw84rnntV9+MDVxV8L19OE/0K/NBRvYpxgWMGCqH79/sHMrCsF6uOpIIgF8bEVQFGBKDSxbNa0nc+npqK5vPdHwvQuy5XuMnGIqsjR4sIMml2lJGi/XqzfU/L9Wj9xfuNNB2ty5PhxgzWiJU1Z1JTzsDsth2PyP29q8a91MQrmpZ9GwHnJdLjbzUv3vbOm9R4/u9K2lwhcBrqrLsj/VfVWMSBP","pineId":"TV_SPLITS","pineVersion":"8.0"}])
 
 
 # Printing all the result
